@@ -1,12 +1,12 @@
 var gulp = require('gulp'),
-  clean = require('gulp-clean'),
+  rimraf = require('gulp-rimraf'),
   jshint = require('gulp-jshint'),
   less = require('gulp-less'),
   minifyCSS = require('gulp-minify-css'),
   html2js = require('gulp-html2js'),
   concat = require('gulp-concat'),
   jade = require('gulp-jade'),
-  ngmin = require('gulp-ngmin'),
+  ngAnnotate = require('gulp-ng-annotate'),
   uglify = require('gulp-uglify'),
   htmlmin = require('gulp-htmlmin'),
   imagemin = require('gulp-imagemin'),
@@ -38,7 +38,7 @@ gulp.task('js:app', function () {
   return gulp.src(files.js.app)
     .pipe(jshint('.jshintrc'))
     .pipe(jshint.reporter('default'))
-    .pipe(ngmin())
+    .pipe(ngAnnotate())
     .pipe(concat('app.js'))
     .pipe(wrap('(function ( window, angular, undefined ) {\n'
       + '\'use strict\';\n'
@@ -72,8 +72,8 @@ gulp.task('html', function () {
 gulp.task('img', function () {
   return gulp.src(files.img.src)
     .pipe(cache(imagemin({
-      optimizationLevel: 5, 
-      progressive: true, 
+      optimizationLevel: 5,
+      progressive: true,
       interlaced: true})))
     .pipe(gulp.dest(files.img.buildDest));
 })
@@ -132,7 +132,7 @@ gulp.task('karma:watch', function () {
     .on('error', function(e) {throw e});
 });
 
-// Run e2e tests using protractor. 
+// Run e2e tests using protractor.
 // Make sure server task is running.
 gulp.task('protractor', ['webdriver:update'], function() {
   return gulp.src(files.test.e2e)
@@ -272,6 +272,6 @@ function gulpJSTemplates (folder) {
 function gulpClean (folder) {
   gulp.task('clean:'+folder, function () {
     return gulp.src(folder, {read: false, force: true})
-      .pipe(clean());
+      .pipe(rimraf());
   });
 }
