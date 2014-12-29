@@ -1,5 +1,5 @@
 var gulp = require('gulp'),
-  rimraf = require('gulp-rimraf'),
+  del = require('del'),
   jshint = require('gulp-jshint'),
   less = require('gulp-less'),
   minifyCSS = require('gulp-minify-css'),
@@ -270,8 +270,7 @@ function gulpJSTemplates (folder) {
  * @return stream
  */
 function gulpClean (folder) {
-  gulp.task('clean:'+folder, function () {
-    return gulp.src(folder, {read: false, force: true})
-      .pipe(rimraf());
+  gulp.task('clean:'+folder, function (callback) {
+    del([folder], callback);
   });
 }
