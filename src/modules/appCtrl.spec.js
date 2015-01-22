@@ -18,6 +18,6 @@ describe('AppCtrl', function () {
   })
 
   it('should have nav links', function () {
-    expect(scope.links.length).toBe(1)
+    expect(scope.links.length).toBe(2)
   })
 })

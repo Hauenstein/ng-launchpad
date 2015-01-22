@@ -1,6 +1,10 @@
 var gulp = require('gulp'),
   del = require('del'),
   jshint = require('gulp-jshint'),
+  coffee = require('gulp-coffee'),
+  coffeelint = require('gulp-coffeelint'),
+  eventStream = require('event-stream'),
+  filter = require('gulp-filter'),
   less = require('gulp-less'),
   minifyCSS = require('gulp-minify-css'),
   html2js = require('gulp-html2js'),
@@ -33,17 +37,27 @@ gulp.task('js:vendor', function () {
     .pipe(gulp.dest(files.js.buildDest));
 });
 
-// Process app's JS into app.js.
+// Process app's js/coffeescript into app.js.
 gulp.task('js:app', function () {
-  return gulp.src(files.js.app)
+  // Stream js and cs files through their linters/compilers:
+  var js = gulp.src(files.js.app)
+    .pipe(filter('**/*.js'))
     .pipe(jshint('.jshintrc'))
-    .pipe(jshint.reporter('default'))
+    .pipe(jshint.reporter('default'));
+  var cs = gulp.src(files.js.app)
+    .pipe(filter('**/*.coffee'))
+    .pipe(coffeelint())
+    .pipe(coffeelint.reporter())
+    .pipe(coffee({bare: true}));
+
+  // Merge the results and stream into app.js:
+  return eventStream.merge(js, cs)
     .pipe(ngAnnotate())
     .pipe(concat('app.js'))
-    .pipe(wrap('(function ( window, angular, undefined ) {\n'
-      + '\'use strict\';\n'
-      + '<%= contents %>'
-      + '})( window, window.angular );'))
+    .pipe(wrap('(function ( window, angular, undefined ) {\n' +
+      '\'use strict\';\n' +
+      '<%= contents %>' +
+      '})( window, window.angular );'))
     .pipe(gulp.dest(files.js.buildDest));
 });
 

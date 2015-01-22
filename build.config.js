@@ -1,6 +1,6 @@
 module.exports = {
   port: 8000,
-  
+
   files: {
     js: {
 
@@ -18,13 +18,10 @@ module.exports = {
       ],
 
       app: [
-        'src/common/**/*.js',
-        '!src/common/**/*.spec.js',
-        '!src/common/**/*.scenario.js',
-
-        'src/modules/**/*.js',
-        '!src/modules/**/*.spec.js',
-        '!src/modules/**/*.scenario.js'
+        'src/{common,modules}/**/*.js',
+        'src/{common,modules}/**/*.coffee',
+        '!src/{common,modules}/**/*.spec.*',
+        '!src/{common,modules}/**/*.scenario.*'
       ],
 
       buildDest: 'build/js'

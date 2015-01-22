@@ -9,5 +9,6 @@ angular.module('app')
 
   $scope.links = [
     {state: 'home', text: 'Home', icon: 'home'},
+    {state: 'coffee', text: 'CoffeeScript', icon: 'coffee'}
   ]
 })

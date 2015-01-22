@@ -1,0 +1,13 @@
+.coffee
+  .container
+    h1 Write in CoffeeScript
+
+    .row
+      .col-sm-12
+        | This is a sample page whose controllers and tests are written in 
+        a(href="http://coffeescript.org/") CoffeeScript
+        
+    .row
+      .col-sm-12
+        div You have clicked the button <span ng-bind="clickCount" /> times
+        .btn.btn-default(ng-click="addClick()") Click me

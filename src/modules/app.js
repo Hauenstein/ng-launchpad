@@ -2,6 +2,7 @@ angular.module( 'app', [
   'templates-modules',
   // 'templates-common',
   'app.home',
+  'app.coffee',
   'ui.router',
   'ui.bootstrap.tpls',
   'ui.bootstrap'
@@ -17,6 +18,14 @@ angular.module( 'app', [
         pageTitle: 'Home'
       }
     })
+    .state('coffee', {
+      url: '/coffee',
+      templateUrl: 'coffee/coffee.tpl.html',
+      controller: 'CoffeeController',
+      data: {
+        pageTitle: 'CoffeeScript'
+      }
+    });
   $urlRouterProvider.otherwise( '/home' )
   $locationProvider.hashPrefix('!')
 })

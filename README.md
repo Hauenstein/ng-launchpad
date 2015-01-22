@@ -33,7 +33,7 @@ However, ng-launchpad is simpler and differs in a few ways:
 * [Protractor](https://github.com/angular/protractor) integration for end-to-end (e2e) tests.
 * Development build has a similar directory structure to production.
   However the files are not minified and compressed.
-* No support for CoffeeScript... yet.
+* [CoffeeScript](http://coffeescript.org) in addition to JavaScript for your coding pleasure.
 
 `ng-launchpad` is a simpler than `ngBoilerplate` on purpose, yet keeps the same ideas.
 
@@ -50,7 +50,7 @@ However, ng-launchpad is simpler and differs in a few ways:
 
 ## Components
 
-The following have already been added because I believe they are the bare 
+The following have already been added because I believe they are the bare
 minimum components you may need. Add or remove according to your requirements.
 
 * [Angular JS](http://angularjs.org)
@@ -59,7 +59,7 @@ minimum components you may need. Add or remove according to your requirements.
 * [UI Bootstrap](http://angular-ui.github.io/bootstrap)
 * [Font Awesome](http://fontawesome.io)
 
-## Learn 
+## Learn
 
 ### Overall Directory Structure
 
@@ -113,7 +113,7 @@ ng-launchpad/
 ### File naming conventions for `src/common` and `src/modules`
 
 * Start file names within a specific module with a common prefix.
-  Example: In the `src/modules/home/` all file names should begin with `home`; 
+  Example: In the `src/modules/home/` all file names should begin with `home`;
   `home.js`, `homeCtrl.js`, `homeCtrl.spec.js`, `home.tpl.jade`, `home.scenario.js`,
   `home.less`.
 * Templates: `*.tpl.jade`.
@@ -175,7 +175,7 @@ through the documented build script, `Gulpfile.js`. But you don't need to do
 that to be very productive with `ng-launchpad`.
 
 Below are the important tasks that come pre-configured with ng-launchpad. All tasks
-should be run in a terminal or command prompt from the root of your app  with `gulp`. 
+should be run in a terminal or command prompt from the root of your app  with `gulp`.
 
 Example:
 
@@ -221,7 +221,7 @@ refresh your page after making changes. You need a Live Reload brower plugin for
 - Safari - [Download from Live Reload](http://download.livereload.com/2.0.9/LiveReload-2.0.9.safariextz)
 
 When you load your page, click the Live Reload icon in your toolbar and
-everything should work magically. 
+everything should work magically.
 
 If you'd prefer to not install a browser extension, then you must add the
 following to the end of the `body` tag in `index.jade`:
