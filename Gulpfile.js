@@ -129,7 +129,7 @@ gulp.task('webdriver:update', webdriverUpdate);
 gulp.task('webdriver:standalone', ['webdriver:update'], webdriverStandalone);
 
 // Run unit tests using karma.
-gulp.task('karma', function () {
+gulp.task('karma', ['build'], function () {
   return gulp.src(files.test.unit)
     .pipe(karma({
       configFile: 'karma.conf.js',
@@ -139,7 +139,7 @@ gulp.task('karma', function () {
 });
 
 // Run unit tests using karma and watch for changes.
-gulp.task('karma:watch', function () {
+gulp.task('karma:watch', ['watch:files'], function () {
   return gulp.src(files.test.unit)
     .pipe(karma({
       configFile: 'karma.conf.js',
@@ -149,8 +149,13 @@ gulp.task('karma:watch', function () {
 });
 
 // Run e2e tests using protractor.
-// Make sure server task is running.
-gulp.task('protractor', ['webdriver:update'], function() {
+gulp.task('protractor', ['protractor:init'], function(callback) {
+  runSequence('protractor:run', 'protractor:close', callback);
+});
+
+gulp.task('protractor:init', ['webdriver:update', 'server']);
+gulp.task('protractor:close', ['server:close']);
+gulp.task('protractor:run', function() {
   return gulp.src(files.test.e2e)
     .pipe(protractor({
         configFile: 'protractor.conf.js',
@@ -159,20 +164,13 @@ gulp.task('protractor', ['webdriver:update'], function() {
 });
 
 // Run e2e tests using protractor and watch for changes.
-// Make sure server task is running.
-gulp.task('protractor:watch', ['protractor'], function () {
-  gulp.watch(['build/**/*', files.test.e2e], ['protractor']);
+gulp.task('protractor:watch', ['protractor:init', 'watch:files'], function () {
+  runSequence('protractor:run');
+  gulp.watch(['build/**/*', files.test.e2e], ['protractor:run']);
 });
 
-gulp.task('test', function(callback) {
-  runSequence(
-    'build',
-    'server',
-    ['karma', 'protractor'],
-    'server:close',
-    callback
-  );
-});
+// One-time run through unit/e2e tests
+gulp.task('test', ['karma', 'protractor']);
 
 // Clean build directory.
 gulpClean('build');
@@ -218,7 +216,7 @@ gulp.task('compile', function (callback) {
 });
 
 // Run server.
-gulp.task('server', function (next) {
+gulp.task('server', ['build'], function (next) {
   var app = connect();
   server = http.createServer(app);
   app.use(connect.static('build'));
@@ -231,7 +229,7 @@ gulp.task('server:close', function(callback) {
 });
 
 // Watch task
-gulp.task('watch:files', function () {
+gulp.task('watch:files', ['server'], function () {
   gulp.watch('build.config.js', ['js:vendor']);
 
   gulp.watch(files.js.app, ['js:app']);
@@ -261,18 +259,10 @@ gulp.task('watch:files', function () {
 gulp.task('watch:test', ['karma:watch', 'protractor:watch']);
 
 // Build, run server, run unit & e2e tests and watch for changes.
-gulp.task('watch', function (callback) {
-  runSequence(
-    'build',
-    'server',
-    ['watch:files', 'watch:test'],
-    callback);
-});
+gulp.task('watch', ['watch:files', 'watch:test']);
 
 // Same as watch:files.
-gulp.task('default', function(callback) {
-  runSequence('build', 'server', 'watch:files', callback);
-});
+gulp.task('default', ['watch:files']);
 
 
 /**
