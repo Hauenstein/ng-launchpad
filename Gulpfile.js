@@ -23,10 +23,12 @@ var gulp = require('gulp'),
   webdriverUpdate = require('gulp-protractor').webdriver_update,
   runSequence = require('run-sequence'),
   files = require('./build.config.js').files,
-  connect = require('connect');
+  connect = require('connect'),
+  http = require('http');
 
 var productionDir = '_public', // production output directory (default: _public)
-  port = require('./build.config.js').port;
+  port = require('./build.config.js').port,
+  server = { close: function(cb) { cb(); } };
 
 
 
@@ -162,7 +164,15 @@ gulp.task('protractor:watch', ['protractor'], function () {
   gulp.watch(['build/**/*', files.test.e2e], ['protractor']);
 });
 
-gulp.task('test', ['karma', 'protractor']);
+gulp.task('test', function(callback) {
+  runSequence(
+    'build',
+    'server',
+    ['karma', 'protractor'],
+    'server:close',
+    callback
+  );
+});
 
 // Clean build directory.
 gulpClean('build');
@@ -208,13 +218,20 @@ gulp.task('compile', function (callback) {
 });
 
 // Run server.
-gulp.task('server', ['build'], function (next) {
-  var server = connect();
-  server.use(connect.static('build')).listen(port, next);
+gulp.task('server', function (next) {
+  var app = connect();
+  server = http.createServer(app);
+  app.use(connect.static('build'));
+  server.listen(port, next);
+});
+
+// Close the server, ex: when one-time tests complete.
+gulp.task('server:close', function(callback) {
+  server.close(callback);
 });
 
 // Watch task
-gulp.task('watch:files', ['server'], function () {
+gulp.task('watch:files', function () {
   gulp.watch('build.config.js', ['js:vendor']);
 
   gulp.watch(files.js.app, ['js:app']);
@@ -234,10 +251,9 @@ gulp.task('watch:files', ['server'], function () {
   gulp.watch(files.img.src, ['img']);
 
   // Livereload
-  var server = livereload();
-
+  var lr = livereload();
   gulp.watch('build/**/*', function (event) {
-    server.changed(event.path);
+    lr.changed(event.path);
   });
 });
 
@@ -247,14 +263,16 @@ gulp.task('watch:test', ['karma:watch', 'protractor:watch']);
 // Build, run server, run unit & e2e tests and watch for changes.
 gulp.task('watch', function (callback) {
   runSequence(
-    'watch:files',
-    'watch:test',
+    'build',
+    'server',
+    ['watch:files', 'watch:test'],
     callback);
 });
 
 // Same as watch:files.
-gulp.task('default', ['watch:files']);
-
+gulp.task('default', function(callback) {
+  runSequence('build', 'server', 'watch:files', callback);
+});
 
 
 /**
