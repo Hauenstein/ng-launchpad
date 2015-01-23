@@ -234,12 +234,9 @@ script(src='http://localhost:35729/livereload.js')
 
 After getting some feedback from the community these are the things I want to put on the todo list:
 
-* CoffeeScript support.
 * Implement a [yeoman](http://yeoman.io) generator.
 
 I haven't tackled any of these yet. So anyone is welcome to take a crack at it.
-
-__Tip__: I think it will be quite easy to add CoffeeScript support.
 
 ## Contributing
 
