@@ -214,7 +214,7 @@ in `Gulpfile.js`. This will rename the `clean:_public` task to `clean:<productio
 `ng-launchpad`'s local server can be found at `http://localhost:8000` or `http://127.0.0.1:8000`.
 
 `ng-launchpad` also includes [Live Reload](http://livereload.com/), so you no longer have to
-refresh your page after making changes. You need a Live Reload brower plugin for this:
+refresh your page after making changes. You need a Live Reload browser plugin for this:
 
 - Chrome - [Chrome Webstore](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei)
 - Firefox - [Download from Live Reload](http://download.livereload.com/2.0.8/LiveReload-2.0.8.xpi)

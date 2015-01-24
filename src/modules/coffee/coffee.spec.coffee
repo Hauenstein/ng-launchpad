@@ -1,4 +1,6 @@
 describe 'CoffeeController', ->
+  scope = null
+  ctrl = null
 
   beforeEach module 'app.coffee'
 

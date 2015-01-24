@@ -56,13 +56,13 @@ module.exports = {
     },
 
     test: {
-      e2e: 'src/**/*.scenario.js',
+      e2e: 'src/**/*.scenario.{js,coffee}',
 
       unit: [
         'build/js/vendor.js',
         'build/js/templates-*.js',
         'build/js/app.js',
-        'src/**/*.spec.js'
+        'src/**/*.spec.{js,coffee}'
       ]
     }
   }

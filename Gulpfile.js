@@ -92,7 +92,7 @@ gulp.task('img', function () {
       progressive: true,
       interlaced: true})))
     .pipe(gulp.dest(files.img.buildDest));
-})
+});
 
 // Compile CSS for production.
 gulp.task('compile:css', function () {
