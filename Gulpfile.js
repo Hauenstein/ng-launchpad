@@ -1,5 +1,6 @@
 var gulp = require('gulp'),
   $ = require('gulp-load-plugins')(),
+  gutil = $.loadUtils(['noop']),
   del = require('del'),
   eventStream = require('event-stream'),
   protractor = $.protractor.protractor,
@@ -8,7 +9,8 @@ var gulp = require('gulp'),
   runSequence = require('run-sequence'),
   files = require('./build.config.js').files,
   connect = require('connect'),
-  http = require('http');
+  http = require('http')
+  switchedPlumber = gutil.noop;
 
 var productionDir = '_public', // production output directory (default: _public)
   port = require('./build.config.js').port,
@@ -27,10 +29,12 @@ gulp.task('js:vendor', function () {
 gulp.task('js:app', function () {
   // Stream js and cs files through their linters/compilers:
   var js = gulp.src(files.js.app)
+    .pipe(switchedPlumber())
     .pipe($.filter('**/*.js'))
     .pipe($.jshint('.jshintrc'))
     .pipe($.jshint.reporter('default'));
   var cs = gulp.src(files.js.app)
+    .pipe(switchedPlumber())
     .pipe($.filter('**/*.coffee'))
     .pipe($.coffeelint())
     .pipe($.coffeelint.reporter())
@@ -56,6 +60,7 @@ gulpJSTemplates('common');
 // Process Less files into main.css.
 gulp.task('css', function () {
   return gulp.src(files.less.main)
+    .pipe(switchedPlumber())
     .pipe($.concat('main.less'))
     .pipe($.less())
     .pipe(gulp.dest(files.less.buildDest));
@@ -64,6 +69,7 @@ gulp.task('css', function () {
 // Convert index.jade into index.html.
 gulp.task('html', function () {
   return gulp.src(files.jade.index)
+    .pipe(switchedPlumber())
     .pipe($.jade({pretty: true}))
     .pipe(gulp.dest(files.jade.buildDest));
 });
@@ -71,6 +77,7 @@ gulp.task('html', function () {
 // Process images.
 gulp.task('img', function () {
   return gulp.src(files.img.src)
+    .pipe(switchedPlumber())
     .pipe($.cache($.imagemin({
       optimizationLevel: 5,
       progressive: true,
@@ -141,10 +148,11 @@ gulp.task('protractor:init', ['webdriver:update', 'server']);
 gulp.task('protractor:close', ['server:close']);
 gulp.task('protractor:run', function() {
   return gulp.src(files.test.e2e)
+    .pipe(switchedPlumber())
     .pipe(protractor({
         configFile: 'protractor.conf.js',
-    }))
-    .on('error', function(e) {throw e});
+    }));
+    //.on('error', function(e) {throw e});
 });
 
 // Run e2e tests using protractor and watch for changes.
@@ -214,6 +222,9 @@ gulp.task('server:close', function(callback) {
 
 // Watch task
 gulp.task('watch:files', ['server'], function () {
+  // Turn on 'plumber' for other tasks so that gulp doesn't quit when it
+  // runs across parse errors, test failures, etc.
+  switchedPlumber = $.plumber;
   gulp.watch('build.config.js', ['js:vendor']);
 
   gulp.watch(files.js.app, ['js:app']);
