@@ -1,26 +1,10 @@
 var gulp = require('gulp'),
+  $ = require('gulp-load-plugins')(),
   del = require('del'),
-  jshint = require('gulp-jshint'),
-  coffee = require('gulp-coffee'),
-  coffeelint = require('gulp-coffeelint'),
   eventStream = require('event-stream'),
-  filter = require('gulp-filter'),
-  less = require('gulp-less'),
-  minifyCSS = require('gulp-minify-css'),
-  html2js = require('gulp-html2js'),
-  concat = require('gulp-concat'),
-  jade = require('gulp-jade'),
-  ngAnnotate = require('gulp-ng-annotate'),
-  uglify = require('gulp-uglify'),
-  htmlmin = require('gulp-htmlmin'),
-  imagemin = require('gulp-imagemin'),
-  cache = require('gulp-cache'),
-  livereload = require('gulp-livereload'),
-  wrap = require('gulp-wrap'),
-  karma = require('gulp-karma'),
-  protractor = require('gulp-protractor').protractor,
-  webdriverStandalone = require('gulp-protractor').webdriver_standalone,
-  webdriverUpdate = require('gulp-protractor').webdriver_update,
+  protractor = $.protractor.protractor,
+  webdriverStandalone = $.protractor.webdriver_standalone,
+  webdriverUpdate = $.protractor.webdriver_update,
   runSequence = require('run-sequence'),
   files = require('./build.config.js').files,
   connect = require('connect'),
@@ -35,7 +19,7 @@ var productionDir = '_public', // production output directory (default: _public)
 // Concatenate vendor JS into vendor.js.
 gulp.task('js:vendor', function () {
   return gulp.src(files.js.vendor)
-    .pipe(concat('vendor.js'))
+    .pipe($.concat('vendor.js'))
     .pipe(gulp.dest(files.js.buildDest));
 });
 
@@ -43,20 +27,20 @@ gulp.task('js:vendor', function () {
 gulp.task('js:app', function () {
   // Stream js and cs files through their linters/compilers:
   var js = gulp.src(files.js.app)
-    .pipe(filter('**/*.js'))
-    .pipe(jshint('.jshintrc'))
-    .pipe(jshint.reporter('default'));
+    .pipe($.filter('**/*.js'))
+    .pipe($.jshint('.jshintrc'))
+    .pipe($.jshint.reporter('default'));
   var cs = gulp.src(files.js.app)
-    .pipe(filter('**/*.coffee'))
-    .pipe(coffeelint())
-    .pipe(coffeelint.reporter())
-    .pipe(coffee({bare: true}));
+    .pipe($.filter('**/*.coffee'))
+    .pipe($.coffeelint())
+    .pipe($.coffeelint.reporter())
+    .pipe($.coffee({bare: true}));
 
   // Merge the results and stream into app.js:
   return eventStream.merge(js, cs)
-    .pipe(ngAnnotate())
-    .pipe(concat('app.js'))
-    .pipe(wrap('(function ( window, angular, undefined ) {\n' +
+    .pipe($.ngAnnotate())
+    .pipe($.concat('app.js'))
+    .pipe($.wrap('(function ( window, angular, undefined ) {\n' +
       '\'use strict\';\n' +
       '<%= contents %>' +
       '})( window, window.angular );'))
@@ -72,22 +56,22 @@ gulpJSTemplates('common');
 // Process Less files into main.css.
 gulp.task('css', function () {
   return gulp.src(files.less.main)
-    .pipe(concat('main.less'))
-    .pipe(less())
+    .pipe($.concat('main.less'))
+    .pipe($.less())
     .pipe(gulp.dest(files.less.buildDest));
 });
 
 // Convert index.jade into index.html.
 gulp.task('html', function () {
   return gulp.src(files.jade.index)
-    .pipe(jade({pretty: true}))
+    .pipe($.jade({pretty: true}))
     .pipe(gulp.dest(files.jade.buildDest));
 });
 
 // Process images.
 gulp.task('img', function () {
   return gulp.src(files.img.src)
-    .pipe(cache(imagemin({
+    .pipe($.cache($.imagemin({
       optimizationLevel: 5,
       progressive: true,
       interlaced: true})))
@@ -97,21 +81,21 @@ gulp.task('img', function () {
 // Compile CSS for production.
 gulp.task('compile:css', function () {
   return gulp.src('build/**/*.css')
-    .pipe(minifyCSS({keepSpecialComments: 0}))
+    .pipe($.minifyCss({keepSpecialComments: 0}))
     .pipe(gulp.dest(productionDir));
 });
 
 // Compile JS for production.
 gulp.task('compile:js', function () {
   return gulp.src('build/**/*.js')
-    .pipe(uglify())
+    .pipe($.uglify())
     .pipe(gulp.dest(productionDir));
 });
 
 // Compile HTML for production.
 gulp.task('compile:html', function () {
   return gulp.src('build/**/*.htm*')
-    .pipe(htmlmin({collapseWhitespace: true}))
+    .pipe($.htmlmin({collapseWhitespace: true}))
     .pipe(gulp.dest(productionDir));
 });
 
@@ -131,7 +115,7 @@ gulp.task('webdriver:standalone', ['webdriver:update'], webdriverStandalone);
 // Run unit tests using karma.
 gulp.task('karma', ['build'], function () {
   return gulp.src(files.test.unit)
-    .pipe(karma({
+    .pipe($.karma({
       configFile: 'karma.conf.js',
       action: 'run'
     }))
@@ -141,7 +125,7 @@ gulp.task('karma', ['build'], function () {
 // Run unit tests using karma and watch for changes.
 gulp.task('karma:watch', ['watch:files'], function () {
   return gulp.src(files.test.unit)
-    .pipe(karma({
+    .pipe($.karma({
       configFile: 'karma.conf.js',
       action: 'watch'
     }))
@@ -249,7 +233,7 @@ gulp.task('watch:files', ['server'], function () {
   gulp.watch(files.img.src, ['img']);
 
   // Livereload
-  var lr = livereload();
+  var lr = $.livereload();
   gulp.watch('build/**/*', function (event) {
     lr.changed(event.path);
   });
@@ -274,13 +258,13 @@ gulp.task('default', ['watch:files']);
 function gulpJSTemplates (folder) {
   gulp.task('js:templates-'+folder, function () {
     return gulp.src(files.jade.tpls[folder])
-      .pipe(jade({pretty: true}))
-      .pipe(html2js({
+      .pipe($.jade({pretty: true}))
+      .pipe($.html2js({
         outputModuleName: 'templates-'+folder,
         useStrict: true,
         base: 'src/'+folder
       }))
-      .pipe(concat('templates-'+folder+'.js'))
+      .pipe($.concat('templates-'+folder+'.js'))
       .pipe(gulp.dest(files.js.buildDest));
   });
 }
